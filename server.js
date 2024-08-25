@@ -62,3 +62,15 @@ app.get('/users',async(req,res)=>{
         res.status(501).json({error:'failed to get users data'})
     }
 })
+
+
+
+app.delete('/users',(req,res)=>{
+    try{
+        const deleteQuery='delete from users;'
+        res.status(201).json({message:'deleted successfully'})
+    }
+    catch (e){
+        res.status(501).json({error:'failed to delete'})
+    }
+})
