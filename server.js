@@ -65,9 +65,10 @@ app.get('/users',async(req,res)=>{
 
 
 
-app.delete('/users',(req,res)=>{
+app.delete('/users',async(req,res)=>{
     try{
         const deleteQuery='delete from users;'
+        await db.run(deleteQuery)
         res.status(201).json({message:'deleted successfully'})
     }
     catch (e){
