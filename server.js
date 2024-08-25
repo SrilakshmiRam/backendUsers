@@ -6,6 +6,12 @@ const cors=require('cors')
 
 const app=express()
 
+app.use(cors({
+    origin:'http://localhost:3000',
+    methods:['GET','POST'],
+    allowedHeaders:['Content-Type']
+}))
+
 const path=require('path')
 const dbPath=path.join(__dirname,'users.db')
 
