@@ -65,7 +65,7 @@ app.get('/users',async(req,res)=>{
     }
 })
 
-app.post('login',async(req,res)=>{
+app.post('/login',async(req,res)=>{
     const {username,password}=req.body
     const userSelectQuery=`select * from users where username=?`
     const dbUser=await db.get(userSelectQuery,[username])
