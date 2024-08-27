@@ -3,7 +3,8 @@ const sqlite=require('sqlite')
 const sqlite3=require('sqlite3')
 const {open}=require('sqlite')
 const cors=require('cors')
-
+const bcrypt=require('bcrypt')
+const jwt=require('jsonwebtoken')
 const app=express()
 
 app.use(cors({
@@ -41,10 +42,11 @@ initiateAndStartDatabaseServer()
 
 app.post('/users',async(req,res)=>{
     const {username,password}=req.body
-    const insertQuery=`insert into users (username,password)
-        values (?,?)`
     try{
-        await db.run(insertQuery,[username,password])
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const insertQuery=`insert into users (username,password)
+        values (?,?)`
+        await db.run(insertQuery,[username,hashedPassword])
         res.status(201).json({message:'user created successfully'})
     } catch (e){
         console.log(`Failed to creating, ${e.message}`)
@@ -60,6 +62,29 @@ app.get('/users',async(req,res)=>{
     } catch (e){
         console.log('error fetching the data',e.message)
         res.status(501).json({error:'failed to get users data'})
+    }
+})
+
+app.post('login',async(req,res)=>{
+    const {username,password}=req.body
+    const userSelectQuery=`select * from users where username=?`
+    const dbUser=await db.get(userSelectQuery,[username])
+    if(dbUser===undefined){
+        res.status(400)
+        res.send("Invalid username")
+    }
+    else{
+        const isPasswordMatched=await bcrypt.compare(password,dbUser.password)
+        if(isPasswordMatched===true){
+            const payload={
+                username:username
+            }
+            const jwtToken=jwt.sign(payload,'my_secret_token')
+            res.send({jwtToken})
+        }else{
+            res.status(400)
+            res.send("invalid password")
+        }
     }
 })
 
